@@ -1,2 +1,243 @@
 # twitter_sentiment_classifier
 Indonesian tweet sentiment classification project with EDA, text preprocessing, TF-IDF + Random Forest, and LSTM baseline.
+
+# Indonesian Tweet Sentiment Classification
+
+This repository contains an Indonesian tweet sentiment classification project covering exploratory data analysis (EDA), text preprocessing, baseline machine learning, and deep learning experiments.
+
+The task is to classify tweets into three sentiment classes:
+
+- `negatif`
+- `netral`
+- `positif`
+
+## Project Overview
+
+The project was built to compare two main approaches for sentiment classification on Indonesian tweets:
+
+1. **TF-IDF + Random Forest**
+2. **LSTM-based sequence model**
+
+The workflow includes:
+
+- data loading and quality checking
+- exploratory data analysis
+- text cleaning and preprocessing
+- train/validation/test split with stratification
+- baseline modeling
+- hyperparameter tuning
+- evaluation using accuracy, macro F1, classification report, and confusion matrix
+
+## Dataset
+
+The dataset contains **1,815 Indonesian tweets** with two main columns:
+
+- `tweet`
+- `sentimen`
+
+### Label distribution
+
+- `positif`: 612
+- `netral`: 607
+- `negatif`: 596
+
+The dataset is relatively balanced, so accuracy is still meaningful, but **macro F1** is used as the main metric to keep evaluation fair across classes.
+
+## Exploratory Data Analysis
+
+Several EDA steps were performed before modeling:
+
+- checking missing values and duplicate tweets
+- inspecting class balance
+- analyzing tweet length using character and word counts
+- extracting top unigram and bigram frequencies
+- generating a word cloud
+
+### Key EDA findings
+
+- No missing values
+- No duplicate tweets
+- Tweets vary quite widely in length
+- The dataset is dominated by **Indonesian political-economic topics**
+- Twitter-specific noise such as `pic twitter`, `twitter com`, and platform tokens appeared frequently
+- Informal/slang words such as `yg`, `gk`, and `ga` were common
+- The positive class tended to have slightly longer tweets on average
+- Extreme outliers existed, so sequence length for the neural model was determined using **p95** instead of max length
+
+## Text Preprocessing
+
+The preprocessing pipeline was designed based on EDA findings.
+
+### Main steps
+
+- lowercase conversion
+- URL removal
+- mention removal
+- hashtag normalization (`#word` -> `word`)
+- non-alphanumeric character removal
+- whitespace normalization
+- slang normalization
+- stopword removal
+- preserving negation words important for sentiment
+- removing Twitter/platform noise tokens
+
+### Important normalization examples
+
+- `yg` -> `yang`
+- `dgn` -> `dengan`
+- `tdk` -> `tidak`
+- `ga`, `gak`, `gk`, `nggak` -> `tidak`
+
+### Negation words intentionally preserved
+
+Because negation is important in sentiment analysis, the following words were kept instead of removed:
+
+- `tidak`
+- `tak`
+- `bukan`
+- `jangan`
+- `belum`
+- `tanpa`
+
+## Data Split
+
+The dataset was split with **stratified sampling** to preserve label proportions across subsets:
+
+- **Train**: 1452 samples
+- **Validation**: 181 samples
+- **Test**: 182 samples
+
+A fixed random seed was used to make experiments reproducible.
+
+## Models
+
+### 1. TF-IDF + Random Forest
+
+This model uses:
+
+- TF-IDF features
+- unigram and bigram representation for the baseline
+- Random Forest classifier with class balancing
+
+A tuning stage was later applied using `RandomizedSearchCV` and `StratifiedKFold`.
+
+### 2. LSTM
+
+The deep learning approach uses:
+
+- Keras `Tokenizer`
+- padded integer sequences
+- maximum sequence length determined from **95th percentile**
+- embedding layer
+- spatial dropout
+- LSTM layer
+- dense classification head
+
+A tuning stage was also performed by testing several combinations of:
+
+- embedding dimension
+- LSTM units
+- dense units
+- dropout
+- learning rate
+- batch size
+
+## Results
+
+## Baseline TF-IDF + Random Forest
+
+| Split | Accuracy | Macro F1 |
+|------|---------:|---------:|
+| Train | 0.9986 | 0.9986 |
+| Validation | 0.6188 | 0.6134 |
+| Test | 0.5330 | 0.5244 |
+
+**Observation:**  
+The model performed almost perfectly on train data, but dropped significantly on validation and test, indicating strong overfitting.
+
+## Tuned TF-IDF + Random Forest
+
+| Split | Accuracy | Macro F1 |
+|------|---------:|---------:|
+| Train | 0.9821 | 0.9821 |
+| Validation | 0.6409 | 0.6352 |
+| Test | 0.5055 | 0.4978 |
+
+**Observation:**  
+Tuning reduced overfitting and improved validation performance, but final test performance dropped slightly compared to the baseline Random Forest.
+
+## Baseline LSTM
+
+| Split | Accuracy | Macro F1 |
+|------|---------:|---------:|
+| Train | 0.7101 | 0.6912 |
+| Validation | 0.5580 | 0.5070 |
+| Test | 0.4670 | 0.4140 |
+
+**Observation:**  
+The baseline LSTM underperformed and struggled especially on the positive class.
+
+## Tuned LSTM
+
+| Split | Accuracy | Macro F1 |
+|------|---------:|---------:|
+| Train | 0.9001 | 0.8988 |
+| Validation | 0.6298 | 0.6197 |
+| Test | 0.5385 | 0.5297 |
+
+### Best tuned LSTM configuration
+
+- `emb_dim = 128`
+- `lstm_units = 128`
+- `dense_units = 32`
+- `dropout = 0.3`
+- `lr = 0.0005`
+- `batch_size = 32`
+
+**Observation:**  
+Tuning significantly improved LSTM performance compared to the baseline, including better recall for the positive class.
+
+## Final Model
+
+The **final selected model is Tuned LSTM**, because it achieved the best **test performance** among the final compared models:
+
+- **Tuned LSTM** -> Test Accuracy: **0.5385**, Macro F1: **0.5297**
+- **Tuned TF-IDF + Random Forest** -> Test Accuracy: **0.5055**, Macro F1: **0.4978**
+
+Although the tuned Random Forest was slightly stronger on validation, the tuned LSTM generalized better on the held-out test set, so it was chosen as the final model.
+
+## Main Takeaways
+
+- The dataset is fairly balanced, so macro F1 is a suitable main metric.
+- EDA was important for identifying Twitter-specific noise and slang normalization needs.
+- Random Forest with TF-IDF was highly prone to overfitting.
+- LSTM required tuning, but after tuning it became the best final model.
+- The **positive** class remained the hardest class to classify correctly.
+
+## Future Improvements
+
+Potential future work includes:
+
+- trying models more suitable for sparse text features such as Logistic Regression or Linear SVM
+- exploring stronger recurrent architectures such as BiLSTM
+- adding attention mechanisms
+- using pretrained embeddings such as Word2Vec
+- comparing results with Indonesian transformer models such as IndoBERT
+- conducting more robust evaluation with multiple splits or cross-validation
+- performing deeper error analysis on the positive class
+
+## Tools and Libraries
+
+Main libraries used in this project include:
+
+- `pandas`
+- `numpy`
+- `matplotlib`
+- `scikit-learn`
+- `nltk`
+- `tensorflow / keras`
+- `wordcloud`
+
+## Notes
+
+This repository focuses on building a complete sentiment classification pipeline starting from data analysis and preprocessing up to baseline comparison and final model selection.
