@@ -225,6 +225,8 @@ Potential future work includes:
 - comparing results with Indonesian transformer models such as IndoBERT
 - conducting more robust evaluation with multiple splits or cross-validation
 - performing deeper error analysis on the positive class
+- using stemming and lematiation library for Indonesian like Sastrawi
+- using wordninja library for more depth hashtag handling
 
 ## Tools and Libraries
 
@@ -235,9 +237,16 @@ Main libraries used in this project include:
 - `matplotlib`
 - `scikit-learn`
 - `nltk`
-- `tensorflow / keras`
+- `tensorflow`
 - `wordcloud`
 
 ## Notes
 
 This repository focuses on building a complete sentiment classification pipeline starting from data analysis and preprocessing up to baseline comparison and final model selection.
+
+## Contributor (NLP Group C)
+- Surya Dharma Putra
+- Agil Setiawan
+- Krisna Fery Rahmantya
+- Khaerani Arista Dewi​
+- Irfan Gani Alim​
