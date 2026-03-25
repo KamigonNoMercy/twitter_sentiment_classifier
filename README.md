@@ -119,7 +119,19 @@ This model uses:
 - unigram and bigram representation for the baseline
 - Random Forest classifier with class balancing
 
-A tuning stage was later applied using `RandomizedSearchCV` and `StratifiedKFold`.
+A tuning stage was later applied using `RandomizedSearchCV` and `StratifiedKFold` to improve generalization and reduce overfitting. The tuning process explored several combinations of:
+
+- n-gram range
+- minimum document frequency (`min_df`)
+- maximum document frequency (`max_df`)
+- maximum TF-IDF features
+- number of trees (`n_estimators`)
+- maximum tree depth
+- minimum samples split
+- minimum samples leaf
+- feature selection strategy in Random Forest
+- class weighting
+
 
 ### 2. LSTM
 
@@ -144,46 +156,25 @@ A tuning stage was also performed by testing several combinations of:
 
 ## Results
 
-## Baseline TF-IDF + Random Forest
+| Model | Test Accuracy | Test Macro F1 |
+|------|--------------:|--------------:|
+| Baseline TF-IDF + Random Forest | 0.5330 | 0.5244 |
+| Tuned TF-IDF + Random Forest | 0.5055 | 0.4978 |
+| Baseline LSTM | 0.4670 | 0.4140 |
+| Tuned LSTM | 0.5385 | 0.5297 |
 
-| Split | Accuracy | Macro F1 |
-|------|---------:|---------:|
-| Train | 0.9986 | 0.9986 |
-| Validation | 0.6188 | 0.6134 |
-| Test | 0.5330 | 0.5244 |
+### Best tuned TF-IDF + Random Forest configuration
 
-**Observation:**  
-The model performed almost perfectly on train data, but dropped significantly on validation and test, indicating strong overfitting.
-
-## Tuned TF-IDF + Random Forest
-
-| Split | Accuracy | Macro F1 |
-|------|---------:|---------:|
-| Train | 0.9821 | 0.9821 |
-| Validation | 0.6409 | 0.6352 |
-| Test | 0.5055 | 0.4978 |
-
-**Observation:**  
-Tuning reduced overfitting and improved validation performance, but final test performance dropped slightly compared to the baseline Random Forest.
-
-## Baseline LSTM
-
-| Split | Accuracy | Macro F1 |
-|------|---------:|---------:|
-| Train | 0.7101 | 0.6912 |
-| Validation | 0.5580 | 0.5070 |
-| Test | 0.4670 | 0.4140 |
-
-**Observation:**  
-The baseline LSTM underperformed and struggled especially on the positive class.
-
-## Tuned LSTM
-
-| Split | Accuracy | Macro F1 |
-|------|---------:|---------:|
-| Train | 0.9001 | 0.8988 |
-| Validation | 0.6298 | 0.6197 |
-| Test | 0.5385 | 0.5297 |
+- `tfidf__ngram_range = (1, 1)`
+- `tfidf__min_df = 3`
+- `tfidf__max_features = 20000`
+- `tfidf__max_df = 0.85`
+- `rf__n_estimators = 300`
+- `rf__min_samples_split = 5`
+- `rf__min_samples_leaf = 1`
+- `rf__max_features = log2`
+- `rf__max_depth = 60`
+- `rf__class_weight = balanced`
 
 ### Best tuned LSTM configuration
 
@@ -204,7 +195,7 @@ The **final selected model is Tuned LSTM**, because it achieved the best **test 
 - **Tuned LSTM** -> Test Accuracy: **0.5385**, Macro F1: **0.5297**
 - **Tuned TF-IDF + Random Forest** -> Test Accuracy: **0.5055**, Macro F1: **0.4978**
 
-Although the tuned Random Forest was slightly stronger on validation, the tuned LSTM generalized better on the held-out test set, so it was chosen as the final model.
+Tthe tuned LSTM generalized better on the held-out test set, so it was chosen as the final model.
 
 ## Main Takeaways
 
