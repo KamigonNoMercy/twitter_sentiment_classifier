@@ -3,7 +3,7 @@ Indonesian tweet sentiment classification project with EDA, text preprocessing, 
 
 # Indonesian Tweet Sentiment Classification
 
-This repository contains an Indonesian tweet sentiment classification project covering exploratory data analysis (EDA), text preprocessing, baseline machine learning, and deep learning experiments.
+This repository contains an Indonesian tweet sentiment classification project covering exploratory data analysis (EDA), text preprocessing, baseline machine learning, and deep learning experiments on tweets posted during the 2019 Indonesian presidential election period.
 
 The task is to classify tweets into three sentiment classes:
 
@@ -13,7 +13,7 @@ The task is to classify tweets into three sentiment classes:
 
 ## Project Overview
 
-The project was built to compare two main approaches for sentiment classification on Indonesian tweets:
+The project was built to compare two main approaches for sentiment classification on Indonesian 2019 tweets:
 
 1. **TF-IDF + Random Forest**
 2. **LSTM-based sequence model**
@@ -242,7 +242,7 @@ Main libraries used in this project include:
 
 ## Notes
 
-This repository focuses on building a complete sentiment classification pipeline starting from data analysis and preprocessing up to baseline comparison and final model selection.
+This repository focuses on building a complete sentiment classification pipeline starting from data analysis and preprocessing up to baseline comparison and final model selection. For a more detailed explanation of the workflow, exploratory data analysis, preprocessing steps, model experiments, and evaluation results, please refer to our Jupyter Notebook (`.ipynb`) files.
 
 ## Contributor (NLP Group C)
 - Surya Dharma Putra
